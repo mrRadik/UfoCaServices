@@ -7,6 +7,7 @@ public class ApplicationSettings
     private IConfiguration _configuration;
     public RabbitMq RabbitMq { get; }
     public GosUslugiApi GosUslugiApi { get; }
+    public string ConnectionString { get; set; }
 
     public ApplicationSettings()
     {
@@ -17,6 +18,7 @@ public class ApplicationSettings
         
         RabbitMq = _configuration.GetRequiredSection("RabbitMQ").Get<RabbitMq>()!;
         GosUslugiApi = _configuration.GetRequiredSection("GosUslugiApi").Get<GosUslugiApi>()!;
+        ConnectionString = _configuration.GetConnectionString("DefaultConnection")!;
     }
 }
 

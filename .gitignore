@@ -1,4 +1,4 @@
-﻿RabbitMQExample/.vs
-RabbitMQExample/CaProducer/obj
-RabbitMQExample/CaProducer/bin
-RabbitMQExample/.idea
+﻿.vs
+obj
+.idea
+bin

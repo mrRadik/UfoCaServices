@@ -1,47 +1,61 @@
 ﻿using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text;
+using BusinessFacade;
 using CaProducer;
 using CaProducer.HttpClient;
+using Domain;
+using Domain.Repositories;
+using Domain.Repositories.Implementations;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 
 class Program
 {
-
+    public static ApplicationSettings Settings => new ApplicationSettings();
+    
     public static async Task Main(string[] args)
     {
         var host = CreateHostBuilder(args).Build();
         var caHttpClient = host.Services.GetService<ICertificateHttpClient>();
+        var logsRepository = host.Services.GetService<ILogsRepository>()!;
         if (caHttpClient == null)
         {
             return;
         }
-        
+
+       
         //var b = await caHttpClient.DownloadCertificate(34749);
         var certList = await caHttpClient.GetCertList();
-        foreach (var cert in certList.Data)
-        {
-            var a = await caHttpClient.DownloadCertificate(cert.Id);
-            Console.WriteLine($"{cert.CertInfo.Subject} {a}");
-        }
+        // foreach (var cert in certList.Data)
+        // {
+        //     var a = await caHttpClient.DownloadCertificate(cert.Id);
+        //     Console.WriteLine($"{cert.CertInfo.Subject} {a}");
+        // }
         Console.ReadKey();
     }
 
     static IHostBuilder CreateHostBuilder(string[] args)
     {
-        var settings = new ApplicationSettings().GosUslugiApi;
-
         return Host.CreateDefaultBuilder(args)
             .ConfigureServices(services =>
             {
+                ConfigureDatabase(services);
                 services.AddSingleton<ICertificateHttpClient, CertificateHttpClient>();
                 services.AddHttpClient<ICertificateHttpClient, CertificateHttpClient>(client =>
                 {
-                    client.BaseAddress = new Uri(settings.BaseUrl);
+                    client.BaseAddress = new Uri(Settings.GosUslugiApi.BaseUrl);
                 });
+                services.AddScoped<ILogsRepository, LogsRepository>();
+                services.AddScoped(typeof(IDbLogger<>), typeof(DbLogger<>));
             });
+    }
+    
+    private static void ConfigureDatabase(IServiceCollection services)
+    {
+        services.AddDbContext<DomainContext>(c => c.UseNpgsql(Settings.ConnectionString));
     }
 
     static Func<Task> CreateTask(int timeToSleepTo, string routingKey)
