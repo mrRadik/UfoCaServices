@@ -1,4 +1,4 @@
-﻿using Domain.Models;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,11 +12,18 @@ public class DomainContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<LogEntity>(ConfigureLog);
+        builder.Entity<LogEntity>(ConfigureLogs);
+        builder.Entity<CertificateEntity>(ConfigureCertificates);
     }
-    private void ConfigureLog(EntityTypeBuilder<LogEntity> builder)
+    private void ConfigureLogs(EntityTypeBuilder<LogEntity> builder)
     {
         builder.ToTable("Logs");
+        builder.HasKey(x => x.Id);
+    }
+    
+    private void ConfigureCertificates(EntityTypeBuilder<CertificateEntity> builder)
+    {
+        builder.ToTable("Certificates");
         builder.HasKey(x => x.Id);
     }
 }

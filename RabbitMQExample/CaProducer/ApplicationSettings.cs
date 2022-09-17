@@ -1,36 +1,39 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BusinessFacade.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace CaProducer;
 
 public class ApplicationSettings
 {
-    private IConfiguration _configuration;
-    public RabbitMq RabbitMq { get; }
+    private static ApplicationSettings? _instance;
+    private static readonly object LockObject = new object();
+    public RabbitMqModel RabbitMq { get; }
     public GosUslugiApi GosUslugiApi { get; }
     public string ConnectionString { get; set; }
 
-    public ApplicationSettings()
+    private ApplicationSettings()
     {
-        _configuration = new ConfigurationBuilder()
+        IConfiguration configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .AddEnvironmentVariables()
             .Build();
         
-        RabbitMq = _configuration.GetRequiredSection("RabbitMQ").Get<RabbitMq>()!;
-        GosUslugiApi = _configuration.GetRequiredSection("GosUslugiApi").Get<GosUslugiApi>()!;
-        ConnectionString = _configuration.GetConnectionString("DefaultConnection")!;
+        RabbitMq = configuration.GetRequiredSection("RabbitMQ").Get<RabbitMqModel>()!;
+        GosUslugiApi = configuration.GetRequiredSection("GosUslugiApi").Get<GosUslugiApi>()!;
+        ConnectionString = configuration.GetConnectionString("DefaultConnection")!;
     }
-}
+    
+    public static ApplicationSettings? GetInstance()
+    {
+        if (_instance != null)
+        {
+            return _instance;
+        }
+        lock (LockObject)
+        {
+            _instance ??= new ApplicationSettings();
+        }
 
-public class RabbitMq
-{
-    public string Host { get; set; } = default!;
-    public string User { get; set; } = default!;
-    public string Password { get; set; } = default!;
-}
-public class GosUslugiApi
-{
-    public string BaseUrl { get; set; } = default!;
-    public string DownloadCertUrl { get; set; } = default!;
-    public string GetCertListUrl { get; set; } = default!;
+        return _instance;
+    }
 }

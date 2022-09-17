@@ -6,10 +6,10 @@ namespace Domain.Repositories.Implementations;
 
 public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
 {
-    readonly DbContext _context;
-    readonly DbSet<TEntity> _dbSet;
+    private readonly DbContext _context;
+    private readonly DbSet<TEntity> _dbSet;
 
-    public GenericRepository(DomainContext context)
+    protected GenericRepository(DbContext context)
     {
         _context = context;
         _dbSet = context.Set<TEntity>();

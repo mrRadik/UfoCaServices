@@ -8,7 +8,7 @@ public class CertListResponseModel
     public bool Ascending { get; set; }
 
     [JsonProperty("issuers")]
-    public object? Issuers { get; set; } = default!;
+    public object? Issuers { get; set; } 
 
     [JsonProperty("orderBy")]
     public string OrderBy { get; set; } = default!;
@@ -20,8 +20,8 @@ public class CertListResponseModel
     public int RecordsOnPage { get; set; }
 
     [JsonProperty("searchString")]
-    public string? SearchString { get; set; } = default!;
+    public string? SearchString { get; set; }
 
     [JsonProperty("statuses")]
-    public object? Statuses { get; set; } = default!;
+    public object? Statuses { get; set; }
 }

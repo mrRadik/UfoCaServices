@@ -1,10 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Reflection;
-using BusinessFacade;
 using BusinessFacade.Models;
+using BusinessFacade.Services.Implementations;
 using CaProducer.Models;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace CaProducer.HttpClient;
@@ -13,11 +11,11 @@ public class CertificateHttpClient : ICertificateHttpClient
 {
     private readonly GosUslugiApi _settings;
     private readonly System.Net.Http.HttpClient _client;
-    private IDbLogger<CertificateHttpClient> _logger;
+    private readonly IDbLogger<CertificateHttpClient> _logger;
     
     public CertificateHttpClient(System.Net.Http.HttpClient client, IDbLogger<CertificateHttpClient> logger)
     {
-        _settings = new ApplicationSettings().GosUslugiApi;
+        _settings = ApplicationSettings.GetInstance()!.GosUslugiApi;
         _client = client;
         _logger = logger;
     }
@@ -64,7 +62,6 @@ public class CertificateHttpClient : ICertificateHttpClient
     
     private async Task<HttpContent> ExecuteRequest(string path, HttpMethod method, object? body = null)
     {
-        throw new Exception("test");
         var requestMessage = new HttpRequestMessage(method, path);
         
         if (body != null)

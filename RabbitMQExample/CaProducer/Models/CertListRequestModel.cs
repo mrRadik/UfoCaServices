@@ -6,9 +6,9 @@ public class CertListRequestModel : CertListResponseModel
 {
     [JsonProperty("total")]
     public int Total { get; set; }
-    
-    [JsonProperty("data")]
-    public IEnumerable<CertificateModel> Data { get; set; }
+
+    [JsonProperty("data")] 
+    public IEnumerable<CertificateModel> Data { get; set; } = default!;
 }
 public class CertificateModel
 {

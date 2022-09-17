@@ -1,8 +1,8 @@
 ﻿using BusinessFacade.Enums;
-using Domain.Models;
+using Domain.Entities;
 using Domain.Repositories;
 
-namespace BusinessFacade;
+namespace BusinessFacade.Services.Implementations;
 
 public interface IDbLogger<T>
 {
@@ -18,8 +18,7 @@ public class DbLogger<T> : IDbLogger<T>
     {
         _logsRepository = logsRepository;
     }
-
-
+    
     public async Task LogError(string message)
     {
         await Log(LogType.Error, message);
