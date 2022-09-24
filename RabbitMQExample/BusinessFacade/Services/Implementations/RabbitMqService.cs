@@ -2,6 +2,7 @@
 using BusinessFacade.Models;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 namespace BusinessFacade.Services.Implementations;
 
@@ -27,17 +28,18 @@ public class RabbitMqService : IRabbitMqService
     public void SendMessage(string message)
     {
         using var channel = _connection.CreateModel();
-        channel.ExchangeDeclare(exchange: "notifier", type: ExchangeType.Fanout);
-
-        //string message = $"Message type [{routingKey}] from publisher N {counter}";
+        channel.ExchangeDeclare(exchange: Constants.ExchangeName, type: ExchangeType.Fanout);
 
         var body = Encoding.UTF8.GetBytes(message);
 
-        channel.BasicPublish(exchange: "notifier",
-            routingKey: "1",
+        channel.BasicPublish(exchange: Constants.ExchangeName,
+            routingKey: Constants.RoutingKey,
             basicProperties: null,
             body: body);
+    }
 
-        //Console.WriteLine($"Message type [{routingKey}] is sent into Direct Exchange [N:{counter++}]");
+    public EventingBasicConsumer CreateConsumer()
+    {
+        throw new NotImplementedException();
     }
 }

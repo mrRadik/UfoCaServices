@@ -1,4 +1,6 @@
-﻿namespace BusinessFacade.Services;
+﻿using RabbitMQ.Client.Events;
+
+namespace BusinessFacade.Services;
 
 public interface IRabbitMqService
 {

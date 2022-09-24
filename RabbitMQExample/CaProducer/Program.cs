@@ -1,8 +1,4 @@
-﻿using BusinessFacade.Services;
-using BusinessFacade.Services.Implementations;
-using CaProducer;
-using CaProducer.HttpClient;
-using Domain.Entities;
+﻿using CaProducer;
 using Microsoft.Extensions.DependencyInjection;
 
 var host = Configuration.CreateHostBuilder(args).Build();
