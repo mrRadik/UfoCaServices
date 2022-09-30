@@ -37,9 +37,4 @@ public class RabbitMqService : IRabbitMqService
             basicProperties: null,
             body: body);
     }
-
-    public EventingBasicConsumer CreateConsumer()
-    {
-        throw new NotImplementedException();
-    }
 }
