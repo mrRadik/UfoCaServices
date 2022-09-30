@@ -1,12 +1,22 @@
-﻿using System.Text;
-using BusinessFacade.Models;
-using Consumer.CertificateInstaller;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+﻿using Consumer.CertificateInstaller;
+using Microsoft.Extensions.DependencyInjection;
 
-var settings = ApplicationSettings.GetInstance()!;
-var token = new CancellationTokenSource().Token;
-var progress = new Progress<string>(Console.WriteLine);
-var consumer = new InstallCertificateConsumer(settings.RabbitMq, progress, token);
-consumer.Start();
-Console.ReadLine();
+var exitEvent = new ManualResetEvent(false);
+
+var host = Configuration.CreateHostBuilder(args).Build();
+var worker = host.Services.GetService<IInstallCertificateWorker>()!;
+var cancellationTokenSource = new CancellationTokenSource();
+var token = cancellationTokenSource.Token;
+
+Console.CancelKeyPress += (sender, eventArgs) => {
+    eventArgs.Cancel = true;
+    exitEvent.Set();
+    cancellationTokenSource.Cancel();
+};
+
+await worker.Start(token);
+
+exitEvent.WaitOne();
+
+cancellationTokenSource.Dispose();
+

@@ -7,16 +7,22 @@ using Domain.Repositories.Implementations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using SystemFacade;
 
 namespace CaProducer;
 
 public static class Configuration
 {
-    private static ApplicationSettings? Settings => ApplicationSettings.GetInstance();
+    private static ApplicationSettings Settings => ApplicationSettings.GetInstance()!;
     
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
         return Host.CreateDefaultBuilder(args)
+            .ConfigureLogging(loggingBuilder =>
+            {
+                loggingBuilder.ClearProviders();
+            })
             .ConfigureServices(services =>
             {
                 ConfigureDatabase(services);
@@ -31,6 +37,7 @@ public static class Configuration
                 services.AddScoped<IDownloadCertificateWorker, DownloadCertificateWorker>();
                 services.AddScoped<IRabbitMqService, RabbitMqService>(_ => new RabbitMqService(Settings.RabbitMq));
                 services.AddScoped(typeof(IDbLogger<>), typeof(DbLogger<>));
+                services.AddScoped<IProgress<string>, ConsoleProgress>();
             });
     }
     

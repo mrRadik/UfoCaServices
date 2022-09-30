@@ -1,40 +1,39 @@
-﻿using BusinessFacade.Services;
+﻿using BusinessFacade;
+using BusinessFacade.Services;
 using BusinessFacade.Services.Implementations;
 using CaProducer.HttpClient;
 using Domain.Entities;
-using SystemFacade.Helpers;
 
 namespace CaProducer;
 
-public interface IDownloadCertificateWorker
+public interface IDownloadCertificateWorker : IBaseWorker
 {
-    Task Start();
 }
 public class DownloadCertificateWorker : IDownloadCertificateWorker
 {
-    private static ICertificateHttpClient _caHttpClient = null!;
-    private static ICertificateService _certsService = null!;
-    private static IRabbitMqService _rabbitService = null!;
-    private static IDbLogger<DownloadCertificateWorker> _logger = null!;
-
-    private static readonly ConsoleHelper<DownloadCertificateWorker> _consoleHelper =
-        new ConsoleHelper<DownloadCertificateWorker>();
-
+    private readonly ICertificateService _certsService;
+    private readonly ICertificateHttpClient _caHttpClient;
+    private readonly IRabbitMqService _rabbitService;
+    private readonly IDbLogger<DownloadCertificateWorker> _logger;
+    private readonly IProgress<string> _progress;
+    
     public DownloadCertificateWorker(ICertificateHttpClient caHttpClient,
         ICertificateService certsService,
         IRabbitMqService rabbitService,
-        IDbLogger<DownloadCertificateWorker> logger)
+        IDbLogger<DownloadCertificateWorker> logger,
+        IProgress<string> progress)
     {
         _caHttpClient = caHttpClient;
         _certsService = certsService;
         _rabbitService = rabbitService;
         _logger = logger;
+        _progress = progress;
     }
 
-    public async Task Start()
+    public async Task Start(CancellationToken token)
     {
-        _consoleHelper.Info("Start");
-        var certList = await _caHttpClient.GetCertList();
+        _progress.Report("Start");
+        var certList = await _caHttpClient.GetCertList(1, 5);
 
         foreach (var cert in certList.Data)
         {
@@ -60,11 +59,11 @@ public class DownloadCertificateWorker : IDownloadCertificateWorker
             try
             {
                 _rabbitService.SendMessage(certEntity);
-                _consoleHelper.Info($"Message for certificate {cert.CertInfo.Thumbprint} was send successful");
+                _progress.Report($"Message for certificate {cert.CertInfo.Thumbprint} was send successfully");
             }
             catch (Exception exception)
             {
-                _consoleHelper.Info("Sending rabbit mq message failed");
+                _progress.Report("Sending rabbit mq message failed");
                 await _logger.LogError(exception.Message);
             }
 
@@ -74,10 +73,15 @@ public class DownloadCertificateWorker : IDownloadCertificateWorker
             }
             catch (Exception exception)
             {
-                _consoleHelper.Info("Saving certificate failed.");
+                _progress.Report("Saving certificate failed.");
                 await _logger.LogError(exception.Message);
             }
+            if (!token.IsCancellationRequested) 
+                continue;
+            
+            _progress.Report("Aborted by user");
+            return;
         }
-        _consoleHelper.Info("Finish");
+        _progress.Report("Finish");
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BusinessFacade.Models;
+using Consumer.CertificateInstaller.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace Consumer.CertificateInstaller;
@@ -9,6 +10,7 @@ public class ApplicationSettings
     private static readonly object LockObject = new object();
     public RabbitMqModel RabbitMq { get; }
     public string ConnectionString { get; set; }
+    public CertificateInstallerSettings InstallerSettings { get; set; }
 
     private ApplicationSettings()
     {
@@ -19,9 +21,10 @@ public class ApplicationSettings
         
         RabbitMq = configuration.GetRequiredSection("RabbitMQ").Get<RabbitMqModel>()!;
         ConnectionString = configuration.GetConnectionString("DefaultConnection")!;
+        InstallerSettings = configuration.GetRequiredSection("CertificateInstaller").Get<CertificateInstallerSettings>()!;
     }
     
-    public static ApplicationSettings? GetInstance()
+    public static ApplicationSettings GetInstance()
     {
         if (_instance != null)
         {
