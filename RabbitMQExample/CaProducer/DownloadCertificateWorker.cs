@@ -3,6 +3,8 @@ using BusinessFacade.Services;
 using BusinessFacade.Services.Implementations;
 using CaProducer.HttpClient;
 using Domain.Entities;
+using RabbitMQBase;
+using RabbitMQBase.Interfaces;
 
 namespace CaProducer;
 

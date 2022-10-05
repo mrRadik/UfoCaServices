@@ -1,4 +1,4 @@
-﻿namespace BusinessFacade.Models;
+﻿namespace RabbitMQBase.Models;
 
 public class RabbitMqModel
 {

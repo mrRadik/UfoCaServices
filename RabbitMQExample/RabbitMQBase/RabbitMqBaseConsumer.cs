@@ -1,10 +1,9 @@
 ﻿using System.Text;
-using BusinessFacade.Models;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using SystemFacade;
+using RabbitMQBase.Models;
 
-namespace BusinessFacade;
+namespace RabbitMQBase;
 
 public abstract class RabbitMqConsumerBase
 {

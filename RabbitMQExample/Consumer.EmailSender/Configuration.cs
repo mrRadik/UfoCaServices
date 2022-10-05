@@ -1,4 +1,4 @@
-﻿using BusinessFacade.Services;
+﻿using System.Net.Mail;
 using BusinessFacade.Services.Implementations;
 using Domain;
 using Domain.Repositories;
@@ -8,8 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SystemFacade;
+using BusinessFacade.Services;
+using EmailService;
+using EmailService.Interfaces;
 
-namespace Consumer.CertificateInstaller;
+namespace Consumer.EmailSender;
 
 public static class Configuration
 {
@@ -17,6 +20,7 @@ public static class Configuration
     
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
+        CreateMessageFolder();
         return Host.CreateDefaultBuilder(args)
             .ConfigureLogging(loggingBuilder =>
             {
@@ -26,14 +30,23 @@ public static class Configuration
             {
                 ConfigureDatabase(services);
                 services.AddScoped(typeof(IDbLogger<>), typeof(DbLogger<>));
-                services.AddScoped<IInstallCertificateWorker, InstallCertificateWorker>();
                 services.AddScoped<ILogsRepository, LogsRepository>();
                 services.AddScoped<IProgress<string>, ConsoleProgress>();
+                services.AddScoped<ISmtpService, SmtpService>(_=>new SmtpService(Settings.EmailSenderSettings.Smtp));
+                services.AddScoped<IEmailSenderWorker, EmailSenderWorker>();
             });
     }
     
     private static void ConfigureDatabase(IServiceCollection services)
     {
         services.AddDbContext<DomainContext>(c => c.UseNpgsql(Settings.ConnectionString));
+    }
+
+    private static void CreateMessageFolder()
+    {
+        if (Settings.EmailSenderSettings.Smtp.SmtpDeliveryMethod == (int)SmtpDeliveryMethod.SpecifiedPickupDirectory)
+        {
+            Directory.CreateDirectory(Settings.EmailSenderSettings.Smtp.PickupDirectoryLocation);
+        }
     }
 }

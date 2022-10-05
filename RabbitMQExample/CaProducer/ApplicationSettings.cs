@@ -1,5 +1,6 @@
-﻿using BusinessFacade.Models;
+﻿using CaProducer.Models;
 using Microsoft.Extensions.Configuration;
+using RabbitMQBase.Models;
 
 namespace CaProducer;
 

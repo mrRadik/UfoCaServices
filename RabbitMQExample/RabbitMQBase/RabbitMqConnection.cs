@@ -1,23 +1,22 @@
-﻿using BusinessFacade.Models;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
+using RabbitMQBase.Models;
 
-namespace BusinessFacade;
+namespace RabbitMQBase;
 
 public class RabbitMqConnection
 {
     private static RabbitMqConnection? _instance;
     private static readonly object LockObject = new object();
-    private static RabbitMqModel _rabbitSettings = default!;
     
-    public IConnection Connection { get; private set; }
+    public IConnection Connection { get; }
 
-    private RabbitMqConnection()
+    private RabbitMqConnection(RabbitMqModel settings)
     {
         var factory = new ConnectionFactory
         {
-            HostName = _rabbitSettings.Host,
-            UserName = _rabbitSettings.User,
-            Password = _rabbitSettings.Password
+            HostName = settings.Host,
+            UserName = settings.User,
+            Password = settings.Password
         };
         
         Connection = factory.CreateConnection();
@@ -31,8 +30,7 @@ public class RabbitMqConnection
         }
         lock (LockObject)
         {
-            _rabbitSettings = settings;
-            _instance ??= new RabbitMqConnection();
+            _instance ??= new RabbitMqConnection(settings);
         }
 
         return _instance;

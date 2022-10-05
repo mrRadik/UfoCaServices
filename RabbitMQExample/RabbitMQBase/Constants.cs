@@ -1,4 +1,4 @@
-﻿namespace BusinessFacade;
+﻿namespace RabbitMQBase;
 
 public struct Constants
 {

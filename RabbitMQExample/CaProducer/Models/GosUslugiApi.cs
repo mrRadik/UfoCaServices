@@ -1,4 +1,4 @@
-﻿namespace BusinessFacade.Models;
+﻿namespace CaProducer.Models;
 
 public class GosUslugiApi
 {

@@ -1,6 +1,6 @@
 ﻿namespace Consumer.CertificateInstaller.Models;
 
-public class CertificateInstallerSettings
+internal class CertificateInstallerSettings
 {
     public bool EmulateInstalling { get; set; }
 }

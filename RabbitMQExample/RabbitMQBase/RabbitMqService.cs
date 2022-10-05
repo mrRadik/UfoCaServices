@@ -1,10 +1,10 @@
 ﻿using System.Text;
-using BusinessFacade.Models;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+using RabbitMQBase.Interfaces;
+using RabbitMQBase.Models;
 
-namespace BusinessFacade.Services.Implementations;
+namespace RabbitMQBase;
 
 public class RabbitMqService : IRabbitMqService
 {

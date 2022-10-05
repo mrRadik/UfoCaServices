@@ -20,6 +20,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BusinessFacade\BusinessFacade.csproj" />
+      <ProjectReference Include="..\RabbitMQBase\RabbitMQBase.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,10 +1,11 @@
 ﻿using System.Text;
-using BusinessFacade;
-using BusinessFacade.Models;
+using BusinessFacade.Services;
 using BusinessFacade.Services.Implementations;
 using Consumer.CertificateInstaller.Models;
 using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
+using RabbitMQBase;
+using RabbitMQBase.Models;
 
 namespace Consumer.CertificateInstaller;
 

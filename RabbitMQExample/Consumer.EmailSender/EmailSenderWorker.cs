@@ -1,30 +1,31 @@
 ﻿using BusinessFacade;
 using BusinessFacade.Services;
-using BusinessFacade.Services.Implementations;
-using SystemFacade;
+using EmailService.Interfaces;
 
-namespace Consumer.CertificateInstaller;
+namespace Consumer.EmailSender;
 
-public interface IInstallCertificateWorker : IBaseWorker
+public interface IEmailSenderWorker : IBaseWorker
 {
 }
 
-public class InstallCertificateWorker : IInstallCertificateWorker
+public class EmailSenderWorker : IEmailSenderWorker
 {
-    private readonly IDbLogger<InstallCertificateConsumer> _dbLogger;
+    private readonly IDbLogger<SendEmailConsumer> _dbLogger;
     private readonly IProgress<string> _progress;
+    private readonly ISmtpService _emailsService;
 
-    public InstallCertificateWorker(IDbLogger<InstallCertificateConsumer> dbLogger, IProgress<string> progress)
+    public EmailSenderWorker(IDbLogger<SendEmailConsumer> dbLogger, IProgress<string> progress, ISmtpService emailsService)
     {
         _dbLogger = dbLogger;
         _progress = progress;
+        _emailsService = emailsService;
     }
     public async Task Start(CancellationToken token)
     {
         await Task.Run(() =>
         {
             var settings = ApplicationSettings.GetInstance()!;
-            var consumer = new InstallCertificateConsumer(settings.RabbitMq, _progress, _dbLogger, token);
+            var consumer = new SendEmailConsumer(settings.RabbitMq, _progress, _emailsService, _dbLogger, token);
             try
             {
                 consumer.SubscribeAndReceive();

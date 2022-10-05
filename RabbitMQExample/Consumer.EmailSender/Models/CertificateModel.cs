@@ -1,4 +1,4 @@
-﻿namespace Consumer.CertificateInstaller.Models;
+﻿namespace Consumer.EmailSender.Models;
 
 internal class CertificateModel
 {

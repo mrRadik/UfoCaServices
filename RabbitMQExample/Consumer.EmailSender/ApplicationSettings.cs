@@ -1,8 +1,8 @@
-﻿using Consumer.CertificateInstaller.Models;
+﻿using Consumer.EmailSender.Models;
 using Microsoft.Extensions.Configuration;
 using RabbitMQBase.Models;
 
-namespace Consumer.CertificateInstaller;
+namespace Consumer.EmailSender;
 
 internal class ApplicationSettings
 {
@@ -10,7 +10,7 @@ internal class ApplicationSettings
     private static readonly object LockObject = new object();
     public RabbitMqModel RabbitMq { get; }
     public string ConnectionString { get; set; }
-    public CertificateInstallerSettings InstallerSettings { get; set; }
+    public EmailSenderSettings EmailSenderSettings { get; set; }
 
     private ApplicationSettings()
     {
@@ -21,7 +21,7 @@ internal class ApplicationSettings
         
         RabbitMq = configuration.GetRequiredSection("RabbitMQ").Get<RabbitMqModel>()!;
         ConnectionString = configuration.GetConnectionString("DefaultConnection")!;
-        InstallerSettings = configuration.GetRequiredSection("CertificateInstaller").Get<CertificateInstallerSettings>()!;
+        EmailSenderSettings = configuration.GetRequiredSection("EmailSenderSettings").Get<EmailSenderSettings>()!;
     }
     
     public static ApplicationSettings GetInstance()

@@ -3,13 +3,6 @@ using Domain.Entities;
 using Domain.Repositories;
 
 namespace BusinessFacade.Services.Implementations;
-
-public interface IDbLogger<T>
-{
-    Task LogError(string message);
-    Task LogInfo(string message);
-    Task LogWarning(string message);
-}
 public class DbLogger<T> : IDbLogger<T>
 {
     private readonly ILogsRepository _logsRepository;

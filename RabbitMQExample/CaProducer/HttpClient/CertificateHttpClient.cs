@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using BusinessFacade.Models;
-using BusinessFacade.Services.Implementations;
+using BusinessFacade.Services;
 using CaProducer.Models;
 using Newtonsoft.Json;
 
