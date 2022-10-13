@@ -14,7 +14,7 @@ public class InstallCertificateConsumer : RabbitMqConsumerBase
     private readonly IProgress<string> _progress;
     private readonly IDbLogger<InstallCertificateConsumer> _dbLogger;
     public InstallCertificateConsumer(
-        RabbitMqModel settings, 
+        RabbitMqSettingsModel settings, 
         IProgress<string> progress,
         IDbLogger<InstallCertificateConsumer> dbLogger,
         CancellationToken token) : base(settings, progress, token)
@@ -26,13 +26,18 @@ public class InstallCertificateConsumer : RabbitMqConsumerBase
     protected override async void OnNewMessageReceived(object sender, BasicDeliverEventArgs e)
     {
         base.OnNewMessageReceived(sender, e);
-        var installerSettings = ApplicationSettings.GetInstance().InstallerSettings;
+        var settings = ApplicationSettings.GetInstance();
         var message = Encoding.Default.GetString(e.Body.ToArray());
         var certificate = JsonConvert.DeserializeObject<CertificateModel>(message);
         try
         {
-            X509Helper.InstallCertificate(certificate.Data, installerSettings.EmulateInstalling);
+            X509Helper.InstallCertificate(certificate.Data, settings.InstallerSettings.EmulateInstalling);
             _progress.Report($"The CA certificate {certificate.Subject} was installed successfully");
+            
+            if (!settings.RabbitMq.AutoAck)
+            {
+                Channel.BasicAck(e.DeliveryTag, false);
+            }
         }
         catch (Exception ex)
         {

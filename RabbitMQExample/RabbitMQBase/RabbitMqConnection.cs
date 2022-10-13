@@ -10,7 +10,7 @@ public class RabbitMqConnection
     
     public IConnection Connection { get; }
 
-    private RabbitMqConnection(RabbitMqModel settings)
+    private RabbitMqConnection(RabbitConnectionSettings settings)
     {
         var factory = new ConnectionFactory
         {
@@ -22,7 +22,12 @@ public class RabbitMqConnection
         Connection = factory.CreateConnection();
     }
 
-    public static RabbitMqConnection GetInstance(RabbitMqModel settings)
+    public static IConnection GetConnection(RabbitConnectionSettings settings)
+    {
+        return GetInstance(settings).Connection;
+    }
+
+    private static RabbitMqConnection GetInstance(RabbitConnectionSettings settings)
     {
         if (_instance != null)
         {

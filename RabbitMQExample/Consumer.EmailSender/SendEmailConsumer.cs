@@ -18,7 +18,7 @@ public class SendEmailConsumer : RabbitMqConsumerBase
     private readonly IDbLogger<SendEmailConsumer> _dbLogger;
 
     public SendEmailConsumer(
-        RabbitMqModel settings, 
+        RabbitMqSettingsModel settings, 
         IProgress<string> progress, 
         ISmtpService emailService, 
         IDbLogger<SendEmailConsumer> dbLogger,
@@ -49,6 +49,10 @@ public class SendEmailConsumer : RabbitMqConsumerBase
         {
             await _emailService.SendEmailAsync(mail);
             _progress.Report("Email sent");
+            if (!settings.RabbitMq.AutoAck)
+            {
+                Channel.BasicAck(e.DeliveryTag, false);
+            }
         }
         catch (Exception ex)
         {

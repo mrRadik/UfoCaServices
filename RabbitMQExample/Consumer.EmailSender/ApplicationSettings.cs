@@ -8,7 +8,7 @@ internal class ApplicationSettings
 {
     private static ApplicationSettings? _instance;
     private static readonly object LockObject = new object();
-    public RabbitMqModel RabbitMq { get; }
+    public RabbitMqSettingsModel RabbitMq { get; }
     public string ConnectionString { get; set; }
     public EmailSenderSettings EmailSenderSettings { get; set; }
 
@@ -19,7 +19,7 @@ internal class ApplicationSettings
             .AddEnvironmentVariables()
             .Build();
         
-        RabbitMq = configuration.GetRequiredSection("RabbitMQ").Get<RabbitMqModel>()!;
+        RabbitMq = configuration.GetRequiredSection("RabbitMQ").Get<RabbitMqSettingsModel>()!;
         ConnectionString = configuration.GetConnectionString("DefaultConnection")!;
         EmailSenderSettings = configuration.GetRequiredSection("EmailSenderSettings").Get<EmailSenderSettings>()!;
     }

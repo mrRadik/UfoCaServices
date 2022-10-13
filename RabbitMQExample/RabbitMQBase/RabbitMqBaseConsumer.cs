@@ -7,34 +7,39 @@ namespace RabbitMQBase;
 
 public abstract class RabbitMqConsumerBase
 {
-    private readonly IConnection _connection;
     private readonly IProgress<string> _progress;
     private readonly CancellationToken _token;
+    private readonly RabbitMqSettingsModel _settings;
+    public readonly IModel Channel;
+    private readonly IConnection _connection;
 
-    protected RabbitMqConsumerBase(RabbitMqModel settings, IProgress<string> progress, CancellationToken token)
+    protected RabbitMqConsumerBase(RabbitMqSettingsModel settings, IProgress<string> progress, CancellationToken token)
     {
-        _connection = RabbitMqConnection.GetInstance(settings).Connection;
+        _connection = RabbitMqConnection.GetConnection(settings.RabbitConnectionSettings);
+        _settings = settings;
         _progress = progress;
         _token = token;
+        Channel = _connection.CreateModel();
     }
     public void SubscribeAndReceive()
     {
-        using var channel = _connection.CreateModel();
-        channel.ExchangeDeclare(exchange: Constants.ExchangeName, type: ExchangeType.Fanout);
+        Channel.ExchangeDeclare(exchange: _settings.RabbitExchangeSettings.ExchangeName, 
+            type: _settings.RabbitExchangeSettings.ExchangeType);
 
-        var queueName = channel.QueueDeclare().QueueName;
+        var queueName = Channel.QueueDeclare().QueueName;
 
-        channel.QueueBind(queue: queueName,
-            exchange: Constants.ExchangeName,
-            routingKey: string.Empty);
-
-        var consumer = new EventingBasicConsumer(channel);
+        Channel.QueueBind(queue: queueName,
+            exchange: _settings.RabbitExchangeSettings.ExchangeName,
+            routingKey: _settings.RoutingKey);
+        
+        var consumer = new EventingBasicConsumer(Channel);
 
         consumer.Received += OnNewMessageReceived!;
 
-        channel.BasicConsume(queue: queueName,
-            autoAck: true,
+        Channel.BasicConsume(queue: queueName,
+            autoAck: _settings.AutoAck, 
             consumer: consumer);
+        
         _progress.Report($"Subscribed to the queue {queueName}");
         _progress.Report("Listening . . .");
         
@@ -43,8 +48,8 @@ public abstract class RabbitMqConsumerBase
         _progress.Report("Stopping . . .");
         
         consumer.Received -= OnNewMessageReceived!;
-        channel.Close();
-        channel.Dispose();
+        Channel.Close();
+        Channel.Dispose();
         _connection.Close();
         _connection.Dispose();
     }

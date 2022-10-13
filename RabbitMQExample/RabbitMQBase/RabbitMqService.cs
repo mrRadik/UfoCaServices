@@ -8,11 +8,13 @@ namespace RabbitMQBase;
 
 public class RabbitMqService : IRabbitMqService
 {
+    private readonly RabbitMqSettingsModel _settings;
     private static IConnection _connection = null!;
     
-    public RabbitMqService(RabbitMqModel settings)
+    public RabbitMqService(RabbitMqSettingsModel settings)
     {
-        _connection = RabbitMqConnection.GetInstance(settings).Connection;
+        _settings = settings;
+        _connection = RabbitMqConnection.GetConnection(settings.RabbitConnectionSettings);
     }
     public void SendMessage(object obj)
     {
@@ -28,12 +30,13 @@ public class RabbitMqService : IRabbitMqService
     public void SendMessage(string message)
     {
         using var channel = _connection.CreateModel();
-        channel.ExchangeDeclare(exchange: Constants.ExchangeName, type: ExchangeType.Fanout);
+        channel.ExchangeDeclare(exchange: _settings.RabbitExchangeSettings.ExchangeName, 
+            type: _settings.RabbitExchangeSettings.ExchangeType);
 
         var body = Encoding.UTF8.GetBytes(message);
 
-        channel.BasicPublish(exchange: Constants.ExchangeName,
-            routingKey: Constants.RoutingKey,
+        channel.BasicPublish(exchange: _settings.RabbitExchangeSettings.ExchangeName,
+            routingKey: _settings.RoutingKey,
             basicProperties: null,
             body: body);
     }

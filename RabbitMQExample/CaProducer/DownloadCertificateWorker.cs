@@ -34,8 +34,9 @@ public class DownloadCertificateWorker : IDownloadCertificateWorker
 
     public async Task Start(CancellationToken token)
     {
+        var settings = ApplicationSettings.GetInstance()!.CaProducerSettings;
         _progress.Report("Start");
-        var certList = await _caHttpClient.GetCertList(1, 5);
+        var certList = await _caHttpClient.GetCertList(settings.Page, settings.Records);
 
         foreach (var cert in certList.Data)
         {
