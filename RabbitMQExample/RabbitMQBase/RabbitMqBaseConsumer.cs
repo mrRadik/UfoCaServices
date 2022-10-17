@@ -1,43 +1,39 @@
 ﻿using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQBase.Models;
 
 namespace RabbitMQBase;
 
 public abstract class RabbitMqConsumerBase
 {
     private readonly IProgress<string> _progress;
+    private readonly IBaseExchange _exchange;
     private readonly CancellationToken _token;
-    private readonly RabbitMqSettingsModel _settings;
-    public readonly IModel Channel;
-    private readonly IConnection _connection;
+    protected readonly IModel Channel;
 
-    protected RabbitMqConsumerBase(RabbitMqSettingsModel settings, IProgress<string> progress, CancellationToken token)
+    protected RabbitMqConsumerBase(IProgress<string> progress,
+        IBaseExchange exchange,
+        CancellationToken token)
     {
-        _connection = RabbitMqConnection.GetConnection(settings.RabbitConnectionSettings);
-        _settings = settings;
         _progress = progress;
+        _exchange = exchange;
         _token = token;
-        Channel = _connection.CreateModel();
+        Channel = exchange.Channel;
     }
-    public void SubscribeAndReceive()
+    public void SubscribeAndReceive(string routingKey ="", bool autoAck = false)
     {
-        Channel.ExchangeDeclare(exchange: _settings.RabbitExchangeSettings.ExchangeName, 
-            type: _settings.RabbitExchangeSettings.ExchangeType);
-
         var queueName = Channel.QueueDeclare().QueueName;
 
         Channel.QueueBind(queue: queueName,
-            exchange: _settings.RabbitExchangeSettings.ExchangeName,
-            routingKey: _settings.RoutingKey);
+            exchange: _exchange.Name,
+            routingKey: routingKey);
         
         var consumer = new EventingBasicConsumer(Channel);
 
         consumer.Received += OnNewMessageReceived!;
 
         Channel.BasicConsume(queue: queueName,
-            autoAck: _settings.AutoAck, 
+            autoAck: autoAck, 
             consumer: consumer);
         
         _progress.Report($"Subscribed to the queue {queueName}");
@@ -48,10 +44,7 @@ public abstract class RabbitMqConsumerBase
         _progress.Report("Stopping . . .");
         
         consumer.Received -= OnNewMessageReceived!;
-        Channel.Close();
-        Channel.Dispose();
-        _connection.Close();
-        _connection.Dispose();
+        _exchange.Dispose();
     }
 
     protected virtual void OnNewMessageReceived(object sender, BasicDeliverEventArgs e)

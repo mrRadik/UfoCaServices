@@ -2,19 +2,16 @@
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQBase.Interfaces;
-using RabbitMQBase.Models;
 
 namespace RabbitMQBase;
 
 public class RabbitMqService : IRabbitMqService
 {
-    private readonly RabbitMqSettingsModel _settings;
-    private static IConnection _connection = null!;
-    
-    public RabbitMqService(RabbitMqSettingsModel settings)
+    private readonly IBaseExchange _exchange;
+
+    public RabbitMqService(IBaseExchange exchange)
     {
-        _settings = settings;
-        _connection = RabbitMqConnection.GetConnection(settings.RabbitConnectionSettings);
+        _exchange = exchange;
     }
     public void SendMessage(object obj)
     {
@@ -27,17 +24,18 @@ public class RabbitMqService : IRabbitMqService
         SendMessage(message);
     }
 
-    public void SendMessage(string message)
+    public void SendMessage(string message, string routingKey = "")
     {
-        using var channel = _connection.CreateModel();
-        channel.ExchangeDeclare(exchange: _settings.RabbitExchangeSettings.ExchangeName, 
-            type: _settings.RabbitExchangeSettings.ExchangeType);
-
         var body = Encoding.UTF8.GetBytes(message);
-
-        channel.BasicPublish(exchange: _settings.RabbitExchangeSettings.ExchangeName,
-            routingKey: _settings.RoutingKey,
+        
+        _exchange.Channel.BasicPublish(exchange: _exchange.Name,
+            routingKey: routingKey,
             basicProperties: null,
             body: body);
+    }
+
+    public void Dispose()
+    {
+        _exchange.Dispose();
     }
 }

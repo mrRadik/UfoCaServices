@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NotificationExchange;
 using RabbitMQBase;
 using RabbitMQBase.Interfaces;
 using SystemFacade;
@@ -37,7 +38,7 @@ public static class Configuration
                 services.AddScoped<ICertificateRepository, CertificatesRepository>();
                 services.AddScoped<ICertificateService, CertificateService>();
                 services.AddScoped<IDownloadCertificateWorker, DownloadCertificateWorker>();
-                services.AddScoped<IRabbitMqService, RabbitMqService>(_ => new RabbitMqService(Settings.RabbitMq));
+                services.AddScoped<IRabbitMqService, RabbitMqService>(_ => new RabbitMqService(new CertificateNotificationExchange()));
                 services.AddScoped(typeof(IDbLogger<>), typeof(DbLogger<>));
                 services.AddScoped<IProgress<string>, ConsoleProgress>();
             });

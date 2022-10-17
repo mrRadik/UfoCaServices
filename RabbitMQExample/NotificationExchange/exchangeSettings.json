@@ -1,0 +1,13 @@
+﻿{
+  "RabbitMq": {
+    "RabbitConnectionSettings": {
+      "Host": "localhost",
+      "User": "user",
+      "Password": "password"
+    },
+    "RabbitExchangeSettings": {
+      "ExchangeType": "fanout",
+      "ExchangeName": ""
+    }
+  }
+}

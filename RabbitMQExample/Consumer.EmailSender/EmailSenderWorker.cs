@@ -1,6 +1,7 @@
 ﻿using BusinessFacade;
 using BusinessFacade.Services;
 using EmailService.Interfaces;
+using NotificationExchange;
 
 namespace Consumer.EmailSender;
 
@@ -25,10 +26,11 @@ public class EmailSenderWorker : IEmailSenderWorker
         await Task.Run(() =>
         {
             var settings = ApplicationSettings.GetInstance()!;
-            var consumer = new SendEmailConsumer(settings.RabbitMq, _progress, _emailsService, _dbLogger, token);
+            var exchange = new CertificateNotificationExchange();
+            var consumer = new SendEmailConsumer(_progress, _emailsService, _dbLogger, exchange, token);
             try
             {
-                consumer.SubscribeAndReceive();
+                consumer.SubscribeAndReceive(settings.EmailSenderSettings.RoutingKey, settings.EmailSenderSettings.AutoAck);
             }
             catch (Exception ex)
             {

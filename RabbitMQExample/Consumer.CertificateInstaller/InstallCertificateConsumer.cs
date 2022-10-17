@@ -1,11 +1,9 @@
 ﻿using System.Text;
 using BusinessFacade.Services;
-using BusinessFacade.Services.Implementations;
 using Consumer.CertificateInstaller.Models;
 using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
 using RabbitMQBase;
-using RabbitMQBase.Models;
 
 namespace Consumer.CertificateInstaller;
 
@@ -14,10 +12,10 @@ public class InstallCertificateConsumer : RabbitMqConsumerBase
     private readonly IProgress<string> _progress;
     private readonly IDbLogger<InstallCertificateConsumer> _dbLogger;
     public InstallCertificateConsumer(
-        RabbitMqSettingsModel settings, 
         IProgress<string> progress,
         IDbLogger<InstallCertificateConsumer> dbLogger,
-        CancellationToken token) : base(settings, progress, token)
+        IBaseExchange exchange,
+        CancellationToken token) : base(progress, exchange, token)
     {
         _progress = progress;
         _dbLogger = dbLogger;
@@ -34,7 +32,7 @@ public class InstallCertificateConsumer : RabbitMqConsumerBase
             X509Helper.InstallCertificate(certificate.Data, settings.InstallerSettings.EmulateInstalling);
             _progress.Report($"The CA certificate {certificate.Subject} was installed successfully");
             
-            if (!settings.RabbitMq.AutoAck)
+            if (!settings.InstallerSettings.AutoAck)
             {
                 Channel.BasicAck(e.DeliveryTag, false);
             }

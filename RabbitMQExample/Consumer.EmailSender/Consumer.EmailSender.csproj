@@ -17,6 +17,7 @@
     <ItemGroup>
       <ProjectReference Include="..\BusinessFacade\BusinessFacade.csproj" />
       <ProjectReference Include="..\EmailService\EmailService.csproj" />
+      <ProjectReference Include="..\NotificationExchange\NotificationExchange.csproj" />
       <ProjectReference Include="..\RabbitMQBase\RabbitMQBase.csproj" />
     </ItemGroup>
 

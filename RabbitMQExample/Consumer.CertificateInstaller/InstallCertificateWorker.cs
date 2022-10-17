@@ -1,7 +1,6 @@
 ﻿using BusinessFacade;
 using BusinessFacade.Services;
-using BusinessFacade.Services.Implementations;
-using SystemFacade;
+using NotificationExchange;
 
 namespace Consumer.CertificateInstaller;
 
@@ -24,10 +23,11 @@ public class InstallCertificateWorker : IInstallCertificateWorker
         await Task.Run(() =>
         {
             var settings = ApplicationSettings.GetInstance()!;
-            var consumer = new InstallCertificateConsumer(settings.RabbitMq, _progress, _dbLogger, token);
+            var exchange = new CertificateNotificationExchange();
+            var consumer = new InstallCertificateConsumer(_progress, _dbLogger, exchange, token);
             try
             {
-                consumer.SubscribeAndReceive();
+                consumer.SubscribeAndReceive(settings.InstallerSettings.RoutingKey, settings.InstallerSettings.AutoAck);
             }
             catch (Exception ex)
             {

@@ -4,8 +4,6 @@ public class RabbitMqSettingsModel
 {
     public RabbitConnectionSettings RabbitConnectionSettings { get; set; } = default!;
     public RabbitExchangeSettings RabbitExchangeSettings { get; set; } = default!;
-    public string RoutingKey { get; set; } = default!;
-    public bool AutoAck { get; set; } = default!;
 }
 
 public class RabbitConnectionSettings

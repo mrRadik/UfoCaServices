@@ -7,7 +7,6 @@ using EmailService.Models;
 using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
 using RabbitMQBase;
-using RabbitMQBase.Models;
 
 namespace Consumer.EmailSender;
 
@@ -18,11 +17,11 @@ public class SendEmailConsumer : RabbitMqConsumerBase
     private readonly IDbLogger<SendEmailConsumer> _dbLogger;
 
     public SendEmailConsumer(
-        RabbitMqSettingsModel settings, 
         IProgress<string> progress, 
         ISmtpService emailService, 
         IDbLogger<SendEmailConsumer> dbLogger,
-        CancellationToken token) : base(settings, progress, token)
+        IBaseExchange exchange,
+        CancellationToken token) : base(progress, exchange,token)
     {
         _progress = progress;
         _emailService = emailService;
@@ -49,7 +48,7 @@ public class SendEmailConsumer : RabbitMqConsumerBase
         {
             await _emailService.SendEmailAsync(mail);
             _progress.Report("Email sent");
-            if (!settings.RabbitMq.AutoAck)
+            if (!settings.EmailSenderSettings.AutoAck)
             {
                 Channel.BasicAck(e.DeliveryTag, false);
             }

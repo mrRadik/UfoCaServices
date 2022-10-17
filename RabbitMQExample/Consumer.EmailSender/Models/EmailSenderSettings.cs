@@ -7,6 +7,8 @@ internal class EmailSenderSettings
     public Addresses Addresses { get; set; } = default!;
     public SmtpSettings Smtp { get; set; }= default!;
     public Mail Mail { get; set; }= default!;
+    public string RoutingKey { get; set; } = default!;
+    public bool AutoAck { get; set; }
 }
 
 internal class Addresses

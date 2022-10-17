@@ -1,7 +1,7 @@
 ﻿namespace RabbitMQBase.Interfaces;
 
-public interface IRabbitMqService
+public interface IRabbitMqService: IDisposable
 {
     void SendMessage(object obj);
-    void SendMessage(string message);
+    void SendMessage(string message, string routingKey = "");
 }

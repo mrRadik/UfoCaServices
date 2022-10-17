@@ -1,9 +1,7 @@
 ﻿using BusinessFacade;
 using BusinessFacade.Services;
-using BusinessFacade.Services.Implementations;
 using CaProducer.HttpClient;
 using Domain.Entities;
-using RabbitMQBase;
 using RabbitMQBase.Interfaces;
 
 namespace CaProducer;
@@ -83,8 +81,11 @@ public class DownloadCertificateWorker : IDownloadCertificateWorker
                 continue;
             
             _progress.Report("Aborted by user");
+            _rabbitService.Dispose();
             return;
         }
+        
         _progress.Report("Finish");
+        _rabbitService.Dispose();
     }
 }

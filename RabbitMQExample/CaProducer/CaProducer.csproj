@@ -31,6 +31,7 @@
     <ItemGroup>
       <ProjectReference Include="..\BusinessFacade\BusinessFacade.csproj" />
       <ProjectReference Include="..\Domain\Domain.csproj" />
+      <ProjectReference Include="..\NotificationExchange\NotificationExchange.csproj" />
       <ProjectReference Include="..\RabbitMQBase\RabbitMQBase.csproj" />
       <ProjectReference Include="..\SystemFacade\SystemFacade.csproj" />
     </ItemGroup>
