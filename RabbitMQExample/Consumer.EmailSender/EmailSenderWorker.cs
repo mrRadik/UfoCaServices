@@ -1,7 +1,7 @@
-﻿using BusinessFacade;
-using BusinessFacade.Services;
-using EmailService.Interfaces;
+﻿using EmailService.Interfaces;
+using Infrastructure.Interfaces;
 using NotificationExchange;
+using Services.Interfaces;
 
 namespace Consumer.EmailSender;
 

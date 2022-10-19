@@ -1,16 +1,15 @@
 ﻿using System.Net.Mail;
-using BusinessFacade.Services.Implementations;
-using Domain;
-using Domain.Repositories;
-using Domain.Repositories.Implementations;
-using Microsoft.EntityFrameworkCore;
+using Domain.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SystemFacade;
-using BusinessFacade.Services;
 using EmailService;
 using EmailService.Interfaces;
+using Infrastructure.Business;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Services.Interfaces;
 
 namespace Consumer.EmailSender;
 

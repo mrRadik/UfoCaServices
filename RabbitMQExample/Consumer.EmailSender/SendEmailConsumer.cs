@@ -1,12 +1,13 @@
 ﻿using System.Net.Mail;
 using System.Text;
-using BusinessFacade.Services;
 using Consumer.EmailSender.Models;
 using EmailService.Interfaces;
 using EmailService.Models;
+using Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
 using RabbitMQBase;
+using Services.Interfaces;
 
 namespace Consumer.EmailSender;
 

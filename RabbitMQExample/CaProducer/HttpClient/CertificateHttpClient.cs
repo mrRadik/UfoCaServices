@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using BusinessFacade.Services;
 using CaProducer.Models;
 using Newtonsoft.Json;
+using Services.Interfaces;
 
 namespace CaProducer.HttpClient;
 

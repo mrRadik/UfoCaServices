@@ -1,6 +1,6 @@
-﻿using BusinessFacade;
-using BusinessFacade.Services;
+﻿using Infrastructure.Interfaces;
 using NotificationExchange;
+using Services.Interfaces;
 
 namespace Consumer.CertificateInstaller;
 

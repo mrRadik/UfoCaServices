@@ -15,11 +15,12 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0-preview.7.22375.6" />
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0-preview.7.22375.6" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0-preview.7.22375.6" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     </ItemGroup>
 
     <ItemGroup>
@@ -29,11 +30,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BusinessFacade\BusinessFacade.csproj" />
-      <ProjectReference Include="..\Domain\Domain.csproj" />
-      <ProjectReference Include="..\NotificationExchange\NotificationExchange.csproj" />
-      <ProjectReference Include="..\RabbitMQBase\RabbitMQBase.csproj" />
-      <ProjectReference Include="..\SystemFacade\SystemFacade.csproj" />
+      <ProjectReference Include="..\Domain.Interfaces\Domain.Interfaces.csproj" />
+      <ProjectReference Include="..\Infrastructure.Business\Infrastructure.Business.csproj" />
+      <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj" />
+      <ProjectReference Include="..\Infrastructure.NotificationExchange\Infrastructure.NotificationExchange.csproj" />
+      <ProjectReference Include="..\Infrastructure.RabbitMQBase\Infrastructure.RabbitMQBase.csproj" />
+      <ProjectReference Include="..\Infrastructure.SystemFacade\Infrastructure.SystemFacade.csproj" />
+      <ProjectReference Include="..\Services.Interfaces\Services.Interfaces.csproj" />
     </ItemGroup>
 
 </Project>

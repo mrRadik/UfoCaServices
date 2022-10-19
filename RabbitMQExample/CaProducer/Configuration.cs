@@ -1,16 +1,15 @@
-﻿using BusinessFacade.Services;
-using BusinessFacade.Services.Implementations;
-using CaProducer.HttpClient;
-using Domain;
-using Domain.Repositories;
-using Domain.Repositories.Implementations;
+﻿using CaProducer.HttpClient;
+using Domain.Interfaces;
+using Infrastructure.Business;
+using Infrastructure.Data;
+using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NotificationExchange;
 using RabbitMQBase;
-using RabbitMQBase.Interfaces;
+using Services.Interfaces;
 using SystemFacade;
 
 namespace CaProducer;

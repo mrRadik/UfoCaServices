@@ -15,13 +15,16 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
       <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BusinessFacade\BusinessFacade.csproj" />
-      <ProjectReference Include="..\NotificationExchange\NotificationExchange.csproj" />
-      <ProjectReference Include="..\RabbitMQBase\RabbitMQBase.csproj" />
+      <ProjectReference Include="..\Infrastructure.Business\Infrastructure.Business.csproj" />
+      <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj" />
+      <ProjectReference Include="..\Infrastructure.NotificationExchange\Infrastructure.NotificationExchange.csproj" />
+      <ProjectReference Include="..\Infrastructure.RabbitMQBase\Infrastructure.RabbitMQBase.csproj" />
+      <ProjectReference Include="..\Services.Interfaces\Services.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>

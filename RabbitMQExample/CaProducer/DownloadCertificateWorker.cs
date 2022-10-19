@@ -1,8 +1,7 @@
-﻿using BusinessFacade;
-using BusinessFacade.Services;
-using CaProducer.HttpClient;
-using Domain.Entities;
-using RabbitMQBase.Interfaces;
+﻿using CaProducer.HttpClient;
+using Domain.Models;
+using Infrastructure.Interfaces;
+using Services.Interfaces;
 
 namespace CaProducer;
 

@@ -1,12 +1,11 @@
-﻿using BusinessFacade.Services;
-using BusinessFacade.Services.Implementations;
-using Domain;
-using Domain.Repositories;
-using Domain.Repositories.Implementations;
+﻿using Domain.Interfaces;
+using Infrastructure.Business;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Services.Interfaces;
 using SystemFacade;
 
 namespace Consumer.CertificateInstaller;
