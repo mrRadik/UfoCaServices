@@ -1,6 +1,7 @@
 ﻿using Domain.Interfaces;
 using Infrastructure.Business;
 using Infrastructure.Data;
+using Infrastructure.Data.Postgre;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,13 +27,13 @@ public static class Configuration
                 ConfigureDatabase(services);
                 services.AddScoped(typeof(IDbLogger<>), typeof(DbLogger<>));
                 services.AddScoped<IInstallCertificateWorker, InstallCertificateWorker>();
-                services.AddScoped<ILogsRepository, LogsRepository>();
+                services.AddScoped<ILogsRepository, LogPostgreRepository>();
                 services.AddScoped<IProgress<string>, ConsoleProgress>();
             });
     }
     
     private static void ConfigureDatabase(IServiceCollection services)
     {
-        services.AddDbContext<DomainContext>(c => c.UseNpgsql(Settings.ConnectionString));
+        services.AddDbContext<PostgreContext>(c => c.UseNpgsql(Settings.ConnectionString));
     }
 }

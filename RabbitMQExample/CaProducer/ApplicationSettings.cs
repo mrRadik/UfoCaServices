@@ -19,8 +19,8 @@ public class ApplicationSettings
             .Build();
         
         GosUslugiApi = configuration.GetRequiredSection("GosUslugiApi").Get<GosUslugiApi>()!;
-        ConnectionString = configuration.GetConnectionString("DefaultConnection")!;
         CaProducerSettings = configuration.GetRequiredSection("CaProducer").Get<CaProducerSettings>()!;
+        ConnectionString = configuration.GetConnectionString(CaProducerSettings.ConnectionStringName)!;
     }
     
     public static ApplicationSettings? GetInstance()

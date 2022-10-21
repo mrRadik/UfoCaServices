@@ -2,6 +2,8 @@
 using Domain.Interfaces;
 using Infrastructure.Business;
 using Infrastructure.Data;
+using Infrastructure.Data.Postgre;
+using Infrastructure.Data.Redis;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using NotificationExchange;
 using RabbitMQBase;
 using Services.Interfaces;
+using StackExchange.Redis;
 using SystemFacade;
 
 namespace CaProducer;
@@ -33,8 +36,6 @@ public static class Configuration
                 {
                     client.BaseAddress = new Uri(Settings.GosUslugiApi.BaseUrl);
                 });
-                services.AddScoped<ILogsRepository, LogsRepository>();
-                services.AddScoped<ICertificateRepository, CertificatesRepository>();
                 services.AddScoped<ICertificateService, CertificateService>();
                 services.AddScoped<IDownloadCertificateWorker, DownloadCertificateWorker>();
                 services.AddScoped<IRabbitMqService, RabbitMqService>(_ => new RabbitMqService(new CertificateNotificationExchange()));
@@ -45,6 +46,34 @@ public static class Configuration
     
     private static void ConfigureDatabase(IServiceCollection services)
     {
-        services.AddDbContext<DomainContext>(c => c.UseNpgsql(Settings.ConnectionString));
+        switch (Settings.CaProducerSettings.ConnectionStringName)
+        {
+            case "PostgreConnectionString":
+                ConfigurePostgre(services);
+                break;
+            case "RedisConnectionString":
+                ConfigureRedis(services);
+                break;
+            default:
+                throw new Exception("Connection string not defined");
+        }
+    }
+    
+    private static void ConfigurePostgre(IServiceCollection services)
+    {
+        services.AddDbContext<PostgreContext>(c => c.UseNpgsql(Settings.ConnectionString));
+        services.AddScoped<ILogsRepository, LogPostgreRepository>();
+        services.AddScoped<ICertificateRepository, CertificatePostgreRepository>();
+    }
+    
+    private static void ConfigureRedis(IServiceCollection services)
+    {
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+        {
+            var settingsConnectionString = Settings.ConnectionString;
+            return ConnectionMultiplexer.Connect(settingsConnectionString);
+        });
+        services.AddScoped<ILogsRepository, LogRedisRepository>();
+        services.AddScoped<ICertificateRepository, CertificateRedisRepository>();
     }
 }

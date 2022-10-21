@@ -3,17 +3,22 @@ using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Data;
+namespace Infrastructure.Data.Postgre;
 
-public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
+public class GenericPostgreRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
 {
     private readonly DbContext _context;
     private readonly DbSet<TEntity> _dbSet;
 
-    protected GenericRepository(DbContext context)
+    protected GenericPostgreRepository(PostgreContext context)
     {
         _context = context;
         _dbSet = context.Set<TEntity>();
+    }
+
+    public Task<TEntity> FindByGuidAsync(Guid guid)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<IReadOnlyList<TEntity>> GetAllAsync()
@@ -31,12 +36,11 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task<TEntity> CreateAsync(TEntity item)
+    public async Task CreateAsync(TEntity item)
     {
         await _dbSet.AddAsync(item);
         await _context.SaveChangesAsync();
-        return item;
-    }
+        }
 
     public async Task UpdateAsync(TEntity item)
     {

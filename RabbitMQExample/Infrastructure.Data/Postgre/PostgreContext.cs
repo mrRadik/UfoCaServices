@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Data;
+namespace Infrastructure.Data.Postgre;
 
-public class DomainContext : DbContext
+public class PostgreContext : DbContext
 {
-    public DomainContext(DbContextOptions<DomainContext> options) : base(options)
+    public PostgreContext(DbContextOptions<PostgreContext> options) : base(options)
     {
     }
     

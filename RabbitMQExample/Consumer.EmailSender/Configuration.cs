@@ -8,6 +8,7 @@ using EmailService;
 using EmailService.Interfaces;
 using Infrastructure.Business;
 using Infrastructure.Data;
+using Infrastructure.Data.Postgre;
 using Microsoft.EntityFrameworkCore;
 using Services.Interfaces;
 
@@ -29,7 +30,7 @@ public static class Configuration
             {
                 ConfigureDatabase(services);
                 services.AddScoped(typeof(IDbLogger<>), typeof(DbLogger<>));
-                services.AddScoped<ILogsRepository, LogsRepository>();
+                services.AddScoped<ILogsRepository, LogPostgreRepository>();
                 services.AddScoped<IProgress<string>, ConsoleProgress>();
                 services.AddScoped<ISmtpService, SmtpService>(_=>new SmtpService(Settings.EmailSenderSettings.Smtp));
                 services.AddScoped<IEmailSenderWorker, EmailSenderWorker>();
@@ -38,7 +39,7 @@ public static class Configuration
     
     private static void ConfigureDatabase(IServiceCollection services)
     {
-        services.AddDbContext<DomainContext>(c => c.UseNpgsql(Settings.ConnectionString));
+        services.AddDbContext<PostgreContext>(c => c.UseNpgsql(Settings.ConnectionString));
     }
 
     private static void CreateMessageFolder()

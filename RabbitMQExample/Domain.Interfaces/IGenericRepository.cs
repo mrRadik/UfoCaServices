@@ -5,8 +5,9 @@ namespace Domain.Interfaces;
 
 public interface IGenericRepository<TEntity> : IDisposable where TEntity : BaseEntity
 {
-    Task<TEntity> CreateAsync(TEntity item);
-    Task<TEntity> FindByIdAsync(int id);
+    Task CreateAsync(TEntity item);
+    Task<TEntity?> FindByIdAsync(int id);
+    Task<TEntity?> FindByGuidAsync(Guid guid);
     Task<IReadOnlyList<TEntity>> GetAllAsync();
     Task<IReadOnlyList<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate);
     Task RemoveAsync(TEntity item);
