@@ -1,40 +1,44 @@
 ﻿using System.Text;
-using Infrastructure.Interfaces;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQBase.Models;
 
 namespace RabbitMQBase;
 
-public abstract class RabbitMqConsumerBase
+public abstract class RabbitMqConsumerBase<T> where T : BaseEvent
 {
     private readonly IProgress<string> _progress;
-    private readonly IBaseExchange _exchange;
+    private readonly BaseExchange<T> _exchange;
+    private readonly ConsumerSettings _settings;
     private readonly CancellationToken _token;
-    protected readonly IModel Channel;
+    private readonly IModel _channel;
 
     protected RabbitMqConsumerBase(IProgress<string> progress,
-        IBaseExchange exchange,
+        BaseExchange<T> exchange,
+        ConsumerSettings settings,
         CancellationToken token)
     {
         _progress = progress;
         _exchange = exchange;
+        _settings = settings;
         _token = token;
-        Channel = exchange.Channel;
+        _channel = exchange.Channel;
     }
-    public void SubscribeAndReceive(string routingKey ="", bool autoAck = false)
+    public void SubscribeAndReceive()
     {
-        var queueName = Channel.QueueDeclare().QueueName;
+        var queueName = _channel.QueueDeclare().QueueName;
 
-        Channel.QueueBind(queue: queueName,
+        _channel.QueueBind(queue: queueName,
             exchange: _exchange.Name,
-            routingKey: routingKey);
+            routingKey: _settings.RoutingKey);
         
-        var consumer = new EventingBasicConsumer(Channel);
+        var consumer = new EventingBasicConsumer(_channel);
 
         consumer.Received += OnNewMessageReceived!;
 
-        Channel.BasicConsume(queue: queueName,
-            autoAck: autoAck, 
+        _channel.BasicConsume(queue: queueName,
+            autoAck: _settings.AutoAck, 
             consumer: consumer);
         
         _progress.Report($"Subscribed to the queue {queueName}");
@@ -48,8 +52,36 @@ public abstract class RabbitMqConsumerBase
         _exchange.Dispose();
     }
 
-    protected virtual void OnNewMessageReceived(object sender, BasicDeliverEventArgs e)
+    private void OnNewMessageReceived(object sender, BasicDeliverEventArgs e)
     {
-        _progress.Report($"New message: {Encoding.UTF8.GetString(e.Body.ToArray())}");
+        var stringMessage = Encoding.Default.GetString(e.Body.ToArray());
+        var message = JsonConvert.DeserializeObject<T>(stringMessage);
+        
+        try
+        {
+            HandleMessage(message, e);
+            if (!_settings.AutoAck)
+            {
+                _channel.BasicAck(e.DeliveryTag, false);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (!_settings.AutoAck)
+            {
+                _channel.BasicNack(e.DeliveryTag, false, true);
+            }
+            HandleError(ex);
+        }
+    }
+
+    protected virtual void HandleMessage(T message, BasicDeliverEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected virtual void HandleError(Exception exception)
+    {
+        throw new NotImplementedException();
     }
 }

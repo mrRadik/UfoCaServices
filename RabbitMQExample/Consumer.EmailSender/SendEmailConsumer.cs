@@ -1,63 +1,53 @@
 ﻿using System.Net.Mail;
-using System.Text;
 using Consumer.EmailSender.Models;
 using EmailService.Interfaces;
 using EmailService.Models;
-using Infrastructure.Interfaces;
-using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
 using RabbitMQBase;
+using RabbitMQBase.Models;
 using Services.Interfaces;
 
 namespace Consumer.EmailSender;
 
-public class SendEmailConsumer : RabbitMqConsumerBase
+public class SendEmailConsumer : RabbitMqConsumerBase<CertificateEvent>
 {
     private readonly IProgress<string> _progress;
     private readonly ISmtpService _emailService;
     private readonly IDbLogger<SendEmailConsumer> _dbLogger;
+    private readonly EmailSenderSettings _settings;
 
     public SendEmailConsumer(
         IProgress<string> progress, 
         ISmtpService emailService, 
         IDbLogger<SendEmailConsumer> dbLogger,
-        IBaseExchange exchange,
-        CancellationToken token) : base(progress, exchange,token)
+        BaseExchange<CertificateEvent> exchange,
+        EmailSenderSettings settings,
+        CancellationToken token) : base(progress, exchange, settings,token)
     {
         _progress = progress;
         _emailService = emailService;
         _dbLogger = dbLogger;
+        _settings = settings;
     }
 
-    protected override async void OnNewMessageReceived(object sender, BasicDeliverEventArgs e)
+    protected override async void HandleMessage(CertificateEvent cert, BasicDeliverEventArgs e)
     {
-        base.OnNewMessageReceived(sender, e);
-        var settings = ApplicationSettings.GetInstance();
-        var message = Encoding.Default.GetString(e.Body.ToArray());
-        var certificate = JsonConvert.DeserializeObject<CertificateModel>(message);
-        
         var mail = new MailModel
         {
-            From = new MailAddress(settings.EmailSenderSettings.Addresses.FromMail,
-                settings.EmailSenderSettings.Addresses.FromDisplayName),
-            To = new MailAddress(settings.EmailSenderSettings.Addresses.ToEmail),
-            Body = string.Format(settings.EmailSenderSettings.Mail.Body, certificate.Subject),
-            Subject = settings.EmailSenderSettings.Mail.Subject
+            From = new MailAddress(_settings.Addresses.FromMail,
+                _settings.Addresses.FromDisplayName),
+            To = new MailAddress(_settings.Addresses.ToEmail),
+            Body = string.Format(_settings.Mail.Body, cert.Subject),
+            Subject = _settings.Mail.Subject
         };
 
-        try
-        {
-            await _emailService.SendEmailAsync(mail);
-            _progress.Report("Email sent");
-            if (!settings.EmailSenderSettings.AutoAck)
-            {
-                Channel.BasicAck(e.DeliveryTag, false);
-            }
-        }
-        catch (Exception ex)
-        {
-            _progress.Report("Email not delivered. For more information see logs");
-            await _dbLogger.LogError(ex.Message);
-        }
+        await _emailService.SendEmailAsync(mail);
+        _progress.Report($"Email from {mail.From.Address} to {mail.To.Address} sent. Body: {mail.Body}");
+    }
+
+    protected override async void HandleError(Exception exception)
+    {
+        _progress.Report("Something went wrong. See logs");
+        await _dbLogger.LogError(exception.Message);
     }
 }

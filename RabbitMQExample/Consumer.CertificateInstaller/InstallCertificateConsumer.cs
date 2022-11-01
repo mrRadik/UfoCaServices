@@ -1,47 +1,38 @@
-﻿using System.Text;
-using Consumer.CertificateInstaller.Models;
-using Infrastructure.Interfaces;
-using Newtonsoft.Json;
+﻿using Consumer.CertificateInstaller.Models;
 using RabbitMQ.Client.Events;
 using RabbitMQBase;
+using RabbitMQBase.Models;
 using Services.Interfaces;
 
 namespace Consumer.CertificateInstaller;
 
-public class InstallCertificateConsumer : RabbitMqConsumerBase
+public class InstallCertificateConsumer : RabbitMqConsumerBase<CertificateEvent>
 {
     private readonly IProgress<string> _progress;
     private readonly IDbLogger<InstallCertificateConsumer> _dbLogger;
+    private readonly CertificateInstallerSettings _settings;
+
     public InstallCertificateConsumer(
         IProgress<string> progress,
         IDbLogger<InstallCertificateConsumer> dbLogger,
-        IBaseExchange exchange,
-        CancellationToken token) : base(progress, exchange, token)
+        BaseExchange<CertificateEvent> exchange,
+        CertificateInstallerSettings settings,
+        CancellationToken token) : base(progress, exchange, settings, token)
     {
         _progress = progress;
         _dbLogger = dbLogger;
+        _settings = settings;
     }
 
-    protected override async void OnNewMessageReceived(object sender, BasicDeliverEventArgs e)
+    protected override void HandleMessage(CertificateEvent cert, BasicDeliverEventArgs e)
     {
-        base.OnNewMessageReceived(sender, e);
-        var settings = ApplicationSettings.GetInstance();
-        var message = Encoding.Default.GetString(e.Body.ToArray());
-        var certificate = JsonConvert.DeserializeObject<CertificateModel>(message);
-        try
-        {
-            X509Helper.InstallCertificate(certificate.Data, settings.InstallerSettings.EmulateInstalling);
-            _progress.Report($"The CA certificate {certificate.Subject} was installed successfully");
-            
-            if (!settings.InstallerSettings.AutoAck)
-            {
-                Channel.BasicAck(e.DeliveryTag, false);
-            }
-        }
-        catch (Exception ex)
-        {
-            _progress.Report("Something went wrong. See logs");
-            await _dbLogger.LogError(ex.Message);
-        }
+        X509Helper.InstallCertificate(cert.Data, _settings.EmulateInstalling);
+        _progress.Report($"The CA certificate {cert.Subject} was installed successfully");
+    }
+
+    protected override async void HandleError(Exception exception)
+    {
+        _progress.Report("Something went wrong. See logs");
+        await _dbLogger.LogError(exception.Message);
     }
 }

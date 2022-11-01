@@ -8,9 +8,9 @@ public class CertListRequestModel : CertListResponseModel
     public int Total { get; set; }
 
     [JsonProperty("data")] 
-    public IEnumerable<CertificateModel> Data { get; set; } = default!;
+    public IEnumerable<CertificateRequestModel> Data { get; set; } = default!;
 }
-public class CertificateModel
+public class CertificateRequestModel
 {
     [JsonProperty("id")]
     public int Id { get; set; }
@@ -31,7 +31,7 @@ public class CertInfo
     public int Id { get; set; }
 
     [JsonProperty("thumbprint")]
-    public string Thumbprint { get; set; } = default!;
+    public string Thumbprint { get; set; } = default!; 
 
     [JsonProperty("issuer")]
     public string Issuer { get; set; } = default!;

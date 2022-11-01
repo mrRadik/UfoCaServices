@@ -4,5 +4,4 @@ namespace Domain.Interfaces;
 
 public interface ICertificateRepository: IGenericRepository<CertificateEntity>
 {
-
 }

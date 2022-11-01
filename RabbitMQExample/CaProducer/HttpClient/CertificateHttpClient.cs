@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using CaProducer.Models;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Services.Interfaces;
 
@@ -12,9 +13,9 @@ public class CertificateHttpClient : ICertificateHttpClient
     private readonly System.Net.Http.HttpClient _client;
     private readonly IDbLogger<CertificateHttpClient> _logger;
     
-    public CertificateHttpClient(System.Net.Http.HttpClient client, IDbLogger<CertificateHttpClient> logger)
+    public CertificateHttpClient(System.Net.Http.HttpClient client, IDbLogger<CertificateHttpClient> logger, IOptions<GosUslugiApi> settings)
     {
-        _settings = ApplicationSettings.GetInstance()!.GosUslugiApi;
+        _settings = settings.Value;
         _client = client;
         _logger = logger;
     }

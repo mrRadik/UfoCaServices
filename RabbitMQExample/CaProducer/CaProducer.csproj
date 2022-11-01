@@ -9,13 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="12.0.0" />
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0-preview.7.22375.6" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0-preview.7.22375.6" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0-preview.7.22375.6" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0-preview.7.22375.6" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0-preview.7.22375.6" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
@@ -35,7 +36,6 @@
       <ProjectReference Include="..\Domain.Interfaces\Domain.Interfaces.csproj" />
       <ProjectReference Include="..\Infrastructure.Business\Infrastructure.Business.csproj" />
       <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj" />
-      <ProjectReference Include="..\Infrastructure.NotificationExchange\Infrastructure.NotificationExchange.csproj" />
       <ProjectReference Include="..\Infrastructure.RabbitMQBase\Infrastructure.RabbitMQBase.csproj" />
       <ProjectReference Include="..\Infrastructure.SystemFacade\Infrastructure.SystemFacade.csproj" />
       <ProjectReference Include="..\Services.Interfaces\Services.Interfaces.csproj" />

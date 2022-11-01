@@ -1,8 +1,8 @@
-﻿namespace Consumer.CertificateInstaller.Models;
+﻿using RabbitMQBase.Models;
 
-internal class CertificateInstallerSettings
+namespace Consumer.CertificateInstaller.Models;
+
+public class CertificateInstallerSettings : ConsumerSettings
 {
     public bool EmulateInstalling { get; set; }
-    public string RoutingKey { get; set; } = default!;
-    public bool AutoAck { get; set; }
 }

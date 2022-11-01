@@ -11,11 +11,10 @@ public class CertificateService : ICertificateService
     {
         _certificateRepository = certificateRepository;
     }
-    public async Task<CertificateEntity?> GetCertificateByThumbprint(string thumbprint)
+    
+    public async Task<bool> IsCertificateExists(string thumbprint)
     {
-       var certs = await _certificateRepository.GetAsync(x => x.Thumbprint.ToLower() == thumbprint.ToLower());
-
-       return certs.ToList().FirstOrDefault();
+        return await _certificateRepository.IsItemExistsAsync(thumbprint.ToLower());
     }
 
     public async Task SaveCertificate(CertificateEntity cert)

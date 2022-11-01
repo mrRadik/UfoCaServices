@@ -1,8 +1,5 @@
 ﻿using CaProducer;
-using Domain.Models;
-using Infrastructure.Data.Redis;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 var exitEvent = new ManualResetEvent(false);
 

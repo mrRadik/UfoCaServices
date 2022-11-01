@@ -1,6 +1,6 @@
 ﻿namespace RabbitMQBase.Models;
 
-public class RabbitMqSettingsModel
+public class RabbitMqSettings
 {
     public RabbitConnectionSettings RabbitConnectionSettings { get; set; } = default!;
     public RabbitExchangeSettings RabbitExchangeSettings { get; set; } = default!;
@@ -14,7 +14,6 @@ public class RabbitConnectionSettings
 }
 
 public class RabbitExchangeSettings
-{
-    public string ExchangeName { get; set; } = default!;
+{ 
     public string ExchangeType { get; set; } = default!;
 }

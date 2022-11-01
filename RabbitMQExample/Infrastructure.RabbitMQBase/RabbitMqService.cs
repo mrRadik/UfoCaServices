@@ -2,14 +2,15 @@
 using Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using RabbitMQBase.Models;
 
 namespace RabbitMQBase;
 
-public class RabbitMqService : IRabbitMqService
+public class RabbitMqService<T> : IRabbitMqService<T> where T : BaseEvent
 {
-    private readonly IBaseExchange _exchange;
+    private readonly BaseExchange<T> _exchange;
 
-    public RabbitMqService(IBaseExchange exchange)
+    public RabbitMqService(BaseExchange<T> exchange)
     {
         _exchange = exchange;
     }

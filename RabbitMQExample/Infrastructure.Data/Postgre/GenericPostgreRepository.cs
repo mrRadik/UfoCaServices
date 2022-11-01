@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,63 +14,20 @@ public class GenericPostgreRepository<TEntity> : IGenericRepository<TEntity> whe
         _context = context;
         _dbSet = context.Set<TEntity>();
     }
-
-    public Task<TEntity> FindByGuidAsync(Guid guid)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<IReadOnlyList<TEntity>> GetAllAsync()
-    {
-        return await _dbSet.AsNoTracking().ToListAsync();
-    }
-
-    public async Task<IReadOnlyList<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate)
-    {
-        return await _dbSet.Where(predicate).ToListAsync();
-    }
-
-    public async Task<TEntity> FindByIdAsync(int id)
-    {
-        return await _dbSet.FindAsync(id);
-    }
-
+ 
     public async Task CreateAsync(TEntity item)
     {
         await _dbSet.AddAsync(item);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsItemExistsAsync(object keyObj)
+    {
+        if (keyObj is not int key)
+        {
+            return false;
         }
-
-    public async Task UpdateAsync(TEntity item)
-    {
-        _context.Entry(item).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task RemoveAsync(TEntity item)
-    {
-        _dbSet.Remove(item);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task<IReadOnlyList<TEntity>> GetWithIncludeAsync(
-        params Expression<Func<TEntity, object>>[] includeProperties)
-    {
-        return await Include(includeProperties).ToListAsync();
-    }
-
-    public async Task<IReadOnlyList<TEntity>> GetWithIncludeAsync(Expression<Func<TEntity, bool>> predicate,
-        params Expression<Func<TEntity, object>>[] includeProperties)
-    {
-        var query = Include(includeProperties);
-        return await query.Where(predicate).ToListAsync();
-    }
-
-    private IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includeProperties)
-    {
-        var query = _dbSet.AsNoTracking();
-        return includeProperties
-            .Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+        return await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == key) != null;
     }
 
     public void Dispose()

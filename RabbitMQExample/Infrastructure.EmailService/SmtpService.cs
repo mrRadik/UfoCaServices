@@ -1,4 +1,5 @@
-﻿using System.Net.Mail;
+﻿using System.Net;
+using System.Net.Mail;
 using EmailService.Interfaces;
 using EmailService.Models;
 
@@ -10,7 +11,15 @@ public class SmtpService : ISmtpService
     
     public SmtpService(SmtpSettings settings)
     {
-        _client = EmailClient.GetInstance(settings).Client;
+        _client = new SmtpClient
+        {
+            Credentials = new NetworkCredential(settings.UserName, settings.Password),
+            Host = settings.Host,
+            Port = settings.Port, 
+            EnableSsl = settings.Ssl,
+            DeliveryMethod = (SmtpDeliveryMethod)settings.SmtpDeliveryMethod,
+            PickupDirectoryLocation = settings.PickupDirectoryLocation
+        };
     }
     
     public async Task SendEmailAsync(MailModel mailDto)

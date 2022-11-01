@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Domain.Models\Domain.Models.csproj" />
+      <ProjectReference Include="..\Infrastructure.RabbitMQBase\Infrastructure.RabbitMQBase.csproj" />
     </ItemGroup>
 
 </Project>
