@@ -39,7 +39,8 @@ public static class Configuration
                     client.BaseAddress = new Uri(baseUrl);
                 });
                 services.AddScoped<ICertificateService, CertificateService>();
-                services.AddScoped<IDownloadCertificateWorker, DownloadCertificateWorker>();
+                services.AddSingleton<DownloadCertificateHostedService>();
+                services.AddHostedService<DownloadCertificateHostedService>();
                 services.AddScoped(typeof(IRabbitMqService<>), typeof(RabbitMqService<>));
                 services.AddScoped(typeof(BaseExchange<>));
                 services.AddScoped(typeof(IDbLogger<>), typeof(DbLogger<>));

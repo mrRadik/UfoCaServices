@@ -5,7 +5,7 @@ var exitEvent = new ManualResetEvent(false);
 
 var host = Configuration.CreateHostBuilder(args).Build();
 
-var worker = host.Services.GetService<IDownloadCertificateWorker>()!;
+var worker = host.Services.GetService<DownloadCertificateHostedService>()!;
 var cancellationTokenSource = new CancellationTokenSource();
 var token = cancellationTokenSource.Token;
 
@@ -15,7 +15,7 @@ Console.CancelKeyPress += (sender, eventArgs) => {
     cancellationTokenSource.Cancel();
 };
 
-await worker.Start(token);
+worker.StartAsync(token);
 
 exitEvent.WaitOne();
 

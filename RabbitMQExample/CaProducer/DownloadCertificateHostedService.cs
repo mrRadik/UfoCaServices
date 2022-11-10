@@ -6,29 +6,27 @@ using Infrastructure.Interfaces;
 using Microsoft.Extensions.Options;
 using RabbitMQBase.Models;
 using Services.Interfaces;
+using SystemFacade;
 
 namespace CaProducer;
 
-public interface IDownloadCertificateWorker : IBaseWorker
-{
-}
-public class DownloadCertificateWorker : IDownloadCertificateWorker
+public class DownloadCertificateHostedService : BaseHostedService
 {
     private readonly ICertificateService _certsService;
     private readonly ICertificateHttpClient _caHttpClient;
     private readonly IRabbitMqService<CertificateEvent> _rabbitService;
-    private readonly IDbLogger<DownloadCertificateWorker> _logger;
+    private readonly IDbLogger<DownloadCertificateHostedService> _logger;
     private readonly IMapper _mapper;
     private readonly CaProducerSettings _settings;
     private readonly IProgress<string> _progress;
     
-    public DownloadCertificateWorker(ICertificateHttpClient caHttpClient,
+    public DownloadCertificateHostedService(ICertificateHttpClient caHttpClient,
         ICertificateService certsService,
         IRabbitMqService<CertificateEvent> rabbitService,
-        IDbLogger<DownloadCertificateWorker> logger,
+        IDbLogger<DownloadCertificateHostedService> logger,
         IOptions<CaProducerSettings> settings,
         IMapper mapper,
-        IProgress<string> progress)
+        IProgress<string> progress) : base(progress)
     {
         _caHttpClient = caHttpClient;
         _certsService = certsService;
@@ -39,32 +37,38 @@ public class DownloadCertificateWorker : IDownloadCertificateWorker
         _progress = progress;
     }
 
-    public async Task Start(CancellationToken token)
+    protected override async Task DoWork(CancellationToken cancellationToken)
     {
-        _progress.Report("Start");
+        _progress.Report("Start getting certificates");
         var certList = await _caHttpClient.GetCertList(_settings.Page, _settings.Records);
-
+        _progress.Report($"{certList.Data.Count()} was received");
+        
         foreach (var cert in certList.Data)
         {
+            _progress.Report($"Start working with {cert.CertInfo.Thumbprint} certificate");
             var isCertificateExists = await _certsService.IsCertificateExists(cert.CertInfo.Thumbprint);
             
             if (!string.Equals(cert.Status, "active", StringComparison.InvariantCultureIgnoreCase) || isCertificateExists)
             {
+                _progress.Report($"Certificate {cert.CertInfo.Thumbprint} already exists");
                 continue;
             }
             
             SendMessage(cert);
             SaveCert(cert);
            
-            if (!token.IsCancellationRequested) 
+            if (!cancellationToken.IsCancellationRequested) 
                 continue;
             
-            _progress.Report("Aborted by user");
-            _rabbitService.Dispose();
+            await StopAsync(cancellationToken);
+            Dispose();
             return;
         }
-        
-        _progress.Report("Finish");
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
         _rabbitService.Dispose();
     }
 
@@ -74,7 +78,7 @@ public class DownloadCertificateWorker : IDownloadCertificateWorker
         try
         {
             _rabbitService.SendMessage(rabbitMessageModel);
-            _progress.Report($"Message for certificate {cert.CertInfo.Thumbprint} was send successfully");
+            _progress.Report($"Message for certificate {cert.CertInfo.Thumbprint} was sent successfully");
         }
         catch (Exception exception)
         {
@@ -89,6 +93,7 @@ public class DownloadCertificateWorker : IDownloadCertificateWorker
         try
         {
             await _certsService.SaveCertificate(certEntity);
+            _progress.Report($"Certificate {certEntity.Thumbprint} was saved succesfully");
         }
         catch (Exception exception)
         {
