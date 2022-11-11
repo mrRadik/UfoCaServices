@@ -41,7 +41,8 @@ public static class Configuration
                 services.AddScoped<ILogsRepository, LogPostgreRepository>();
                 services.AddScoped<IProgress<string>, ConsoleProgress>();
                 services.AddSingleton<ISmtpService, SmtpService>(_=> new SmtpService(smtpSettings));
-                services.AddScoped<IEmailSenderWorker, EmailSenderWorker>();
+                services.AddSingleton<EmailSenderHostedService>();
+                services.AddHostedService<EmailSenderHostedService>();
                 services.AddScoped(typeof(BaseExchange<>));
             });
     }

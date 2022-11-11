@@ -31,7 +31,8 @@ public static class Configuration
                 ConfigureDatabase(services, connectionString);
                 
                 services.AddScoped(typeof(IDbLogger<>), typeof(DbLogger<>));
-                services.AddScoped<IInstallCertificateWorker, InstallCertificateWorker>();
+                services.AddSingleton<InstallCertificateHostedService>();
+                services.AddHostedService<InstallCertificateHostedService>();
                 services.AddScoped<ILogsRepository, LogPostgreRepository>();
                 services.AddScoped<IProgress<string>, ConsoleProgress>();
                 services.AddScoped(typeof(BaseExchange<>));

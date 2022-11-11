@@ -1,18 +1,14 @@
 ﻿using Consumer.EmailSender.Models;
 using EmailService.Interfaces;
-using Infrastructure.Interfaces;
 using Microsoft.Extensions.Options;
 using RabbitMQBase;
 using RabbitMQBase.Models;
 using Services.Interfaces;
+using SystemFacade;
 
 namespace Consumer.EmailSender;
 
-public interface IEmailSenderWorker : IBaseWorker
-{
-}
-
-public class EmailSenderWorker : IEmailSenderWorker
+public class EmailSenderHostedService : BaseHostedService
 {
     private readonly IDbLogger<SendEmailConsumer> _dbLogger;
     private readonly IProgress<string> _progress;
@@ -20,11 +16,11 @@ public class EmailSenderWorker : IEmailSenderWorker
     private readonly BaseExchange<CertificateEvent> _exchange;
     private readonly EmailSenderSettings _settings;
 
-    public EmailSenderWorker(IDbLogger<SendEmailConsumer> dbLogger, 
+    public EmailSenderHostedService(IDbLogger<SendEmailConsumer> dbLogger, 
         IProgress<string> progress, 
         ISmtpService emailsService,
         BaseExchange<CertificateEvent> exchange,
-        IOptions<EmailSenderSettings> settings)
+        IOptions<EmailSenderSettings> settings) : base(progress)
     {
         _dbLogger = dbLogger;
         _progress = progress;
@@ -32,7 +28,7 @@ public class EmailSenderWorker : IEmailSenderWorker
         _exchange = exchange;
         _settings = settings.Value;
     }
-    public async Task Start(CancellationToken token)
+    protected override async Task DoWork(CancellationToken token)
     {
         await Task.Run(() =>
         {
@@ -48,5 +44,11 @@ public class EmailSenderWorker : IEmailSenderWorker
             }
         }, token);
 
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        _exchange.Dispose();
     }
 }
